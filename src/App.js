@@ -2,8 +2,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
+import { SOCKET_URL, CV_API_URL } from "./config"; // ✅ import from your new config file
 
-const SIO = io("http://localhost:5000");
+const SIO = io(SOCKET_URL); // ✅ use SOCKET_URL instead of localhost
 
 // helpers: base64 <-> arraybuffer
 function b64ToArrayBuffer(b64) {
@@ -203,7 +204,8 @@ export default function App() {
 
   // Detection WS
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:7001/ws");
+    const DETECTION_WS = CV_API_URL.replace(/^http/, "ws") + "/ws";
+    const ws = new WebSocket(DETECTION_WS);
     detectWSRef.current = ws;
     ws.onmessage = async (evt) => {
       try {
@@ -232,7 +234,8 @@ export default function App() {
     let ws = null, interval = null, mounted = true;
     const startFramesWS = async () => {
       try {
-        ws = new WebSocket("ws://localhost:7001/ws_frames");
+        const FRAMES_WS = CV_API_URL.replace(/^http/, "ws") + "/ws_frames";
+        ws = new WebSocket(FRAMES_WS);
         framesWSRef.current = ws;
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
         if (videoRef.current) {
